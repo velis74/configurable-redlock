@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "configurable-redlock"
+version = "1.0.0"
+description = "Simplified Redlock API with configurable TTL and silent exception handling for deadlock prevention"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.6"
+dependencies = [
+    "pottery>=3.0.0",
+    "redis",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "fakeredis",
+    "build",
+    "twine",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[project.urls]
+Homepage = "https://github.com/velis74/configurable-redlock"
+Issues = "https://github.com/velis74/configurable-redlock/issues"
+Documentation = "https://docs.velis.si/configurable-redlock.html"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/configurable_redlock"]
