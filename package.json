@@ -1,0 +1,16 @@
+{
+  "name": "configurable-redlock-tooling",
+  "private": true,
+  "type": "module",
+  "description": "Lint tooling for the configurable-redlock Python package",
+  "license": "MIT",
+  "scripts": {
+    "lint": "node scripts/lint.mjs"
+  },
+  "devDependencies": {
+    "eslint-config-velis": "^3.0.1",
+    "globals": "^17.14.0",
+    "markdownlint-cli2": "^0.24.2",
+    "typescript": "^6.0.3"
+  }
+}
