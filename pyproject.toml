@@ -12,7 +12,7 @@ license-files = ["LICENSE"]
 authors = [
     { name = "Jure Erznožnik", email = "jure.erznoznik@velis.si" },
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "pottery>=3.0.0",
     "redis",
