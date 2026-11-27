@@ -8,3 +8,8 @@ build/
 .claude/
 .idea/
 *.egg
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.json
+node_modules/
