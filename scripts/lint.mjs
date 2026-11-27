@@ -1,7 +1,7 @@
 // @ts-check
 /**
- * Runs eslint, markdownlint and tsc. Without arguments it only reports; with `--fix`, eslint and markdownlint also rewrite what they can
- * fix. Every step runs, and the exit code is non-zero if any step fails.
+ * Runs eslint, markdownlint and tsc. Without arguments it only reports; with `--fix`, eslint and markdownlint also
+ * rewrite what they can fix. Every step runs, and the exit code is non-zero if any step fails.
  *
  *   npm run lint              report only
  *   npm run lint -- --fix     report and fix
