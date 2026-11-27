@@ -72,6 +72,7 @@ jobs:
   all-green:
     runs-on: ubuntu-latest
     needs: [python, node, coverage]
+    permissions: {}
     if: always()
     steps:
       - run: exit 1
