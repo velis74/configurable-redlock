@@ -1,19 +1,27 @@
 # configurable-redlock
 
-A Python distributed lock built on top of [pottery](https://github.com/brainix/pottery)'s Redlock implementation. It wraps pottery's `Redlock` with a simpler timeout API and adds two features that pottery cannot provide natively: silent skip (skip a `with` block body without `try/except`) and waiting statistics (Redis counters tracking how many processes are waiting per lock key).
+A Python distributed lock built on top of [pottery](https://github.com/brainix/pottery)'s Redlock implementation.
+It wraps pottery's `Redlock` with a simpler timeout API and adds two features that pottery cannot provide natively:
+silent skip (skip a `with` block body without `try/except`) and waiting statistics (Redis counters tracking how many
+processes are waiting per lock key).
 
 ## Features
 
-- **Distributed locking via Redis** — uses pottery's Redlock algorithm, safe across multiple processes and machines, with automatic TTL (`auto_release_time`, default 30 s) to prevent deadlocks on process crash.
-- **Simple timeout API** — one `timeout` parameter: `0` = wait forever, `-1` = skip if locked, `N` = wait up to N seconds.
-- **Silent skip** — `cl()` + `silence_object_lock_timeout=True` skips the block body without `try/except` when the lock is not acquired.
-- **Waiting statistics** — while a process waits for the lock, the number of waiters and the set of contended lock keys are tracked in Redis, allowing external monitoring of lock contention.
-- **Configurable Redis client** — pass a single `redis.Redis` client or an iterable of clients for true multi-master Redlock quorum. Defaults to `redis.Redis()`.
+- **Distributed locking via Redis** — uses pottery's Redlock algorithm, safe across multiple processes and machines,
+  with automatic TTL (`auto_release_time`, default 30 s) to prevent deadlocks on process crash.
+- **Simple timeout API** — one `timeout` parameter: `0` = wait forever, `-1` = skip if locked, `N` = wait up to
+  N seconds.
+- **Silent skip** — `cl()` + `silence_object_lock_timeout=True` skips the block body without `try/except` when the
+  lock is not acquired.
+- **Waiting statistics** — while a process waits for the lock, the number of waiters and the set of contended lock
+  keys are tracked in Redis, allowing external monitoring of lock contention.
+- **Configurable Redis client** — pass a single `redis.Redis` client or an iterable of clients for true multi-master
+  Redlock quorum. Defaults to `redis.Redis()`.
 - **Async support** — `ConfigurableAIOREDLock` provides the same API for `async with` / `await` usage.
 
 ## Documentation
 
-Full documentation: https://docs.velis.si/configurable-redlock.html
+Full documentation: <https://docs.velis.si/configurable-redlock.html>
 
 ## Why not just use pottery's Redlock?
 
@@ -34,6 +42,7 @@ Full documentation: https://docs.velis.si/configurable-redlock.html
 ### Timeout
 
 **pottery:**
+
 ```python
 from pottery import Redlock
 from pottery.exceptions import QuorumNotAchieved
@@ -46,6 +55,7 @@ except QuorumNotAchieved:
 ```
 
 **ConfigurableREDLock:**
+
 ```python
 from configurable_redlock import ConfigurableREDLock, ObjectLockTimeout
 
@@ -60,6 +70,7 @@ except ObjectLockTimeout:
 ### Silent skip (no try/except)
 
 **pottery** — not possible without `try/except`:
+
 ```python
 from pottery.exceptions import QuorumNotAchieved
 
@@ -71,6 +82,7 @@ except QuorumNotAchieved:
 ```
 
 **ConfigurableREDLock:**
+
 ```python
 with ConfigurableREDLock(name='res', timeout=-1, silence_object_lock_timeout=True) as cl:
     cl()      # silently skips everything below if lock not acquired — no try/except needed
@@ -175,7 +187,7 @@ with ConfigurableREDLock(name="my-resource", timeout=-1, silence_object_lock_tim
 ## Parameters
 
 | Parameter | Default | Description |
-|---|---|---|
+| --- | --- | --- |
 | `name` | required | Lock identifier. Stored in Redis as `ConfigurableLock.<name>`. |
 | `timeout` | `0` | `0` = wait forever, `-1` = skip if locked, `N` = wait up to N seconds. |
 | `auto_release_time` | `30.0` | Lock TTL in seconds. The lock is automatically released after this time, preventing deadlocks if the process crashes. |
@@ -195,6 +207,6 @@ This allows external monitoring of lock contention.
 ## Exceptions
 
 | Exception | When raised |
-|---|---|
+| --- | --- |
 | `ObjectLockTimeout` | Raised by `cl()` when the lock was not acquired (`timeout=-1` or `timeout=N` expired). |
 | `NoTimeoutCheck` | Raised on `__exit__` when `timeout != 0` and `cl()` was never called inside the block. |

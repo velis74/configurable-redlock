@@ -1,36 +1,85 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.13.6,<0.14"]
+build-backend = "uv_build"
 
 [project]
 name = "configurable-redlock"
 version = "1.0.0"
 description = "Simplified Redlock API with configurable TTL and silent exception handling for deadlock prevention"
 readme = "README.md"
-license = { text = "MIT" }
-requires-python = ">=3.6"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Jure Erznožnik", email = "jure.erznoznik@velis.si" },
+]
+requires-python = ">=3.9"
 dependencies = [
     "pottery>=3.0.0",
     "redis",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
+    "fakeredis",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
-    "fakeredis",
-    "build",
-    "twine",
+    "ruff",
 ]
-
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
 
 [project.urls]
 Homepage = "https://github.com/velis74/configurable-redlock"
+Repository = "https://github.com/velis74/configurable-redlock"
 Issues = "https://github.com/velis74/configurable-redlock/issues"
 Documentation = "https://docs.velis.si/configurable-redlock.html"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/configurable_redlock"]
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+source = ["configurable_redlock"]
+
+[tool.ruff]
+exclude = ['*.md', 'dist', 'build', 'node_modules', '.git', '.idea', '.vscode', '.pytest_cache', '.ruff_cache',
+    '.venv']
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # Pyflakes
+    "I",    # isort
+    "Q",    # flake8-quotes
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "N",    # pep8-naming
+    "PT",   # flake8-pytest-style
+    "S",    # flake8-bandit
+    "C4",   # flake8-comprehensions
+    "ARG",  # flake8-unused-arguments
+]
+ignore = ["E731", "E722", "C408"]
+
+fixable = ["ALL"]
+unfixable = []
+
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+# N818 requires exception names to end in "Error"; these names are public API.
+"src/configurable_redlock/exceptions.py" = ["N818"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.isort]
+case-sensitive = false
+lines-between-types = 1
+combine-as-imports = true
+order-by-type = false
