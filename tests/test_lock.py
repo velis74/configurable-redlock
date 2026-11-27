@@ -1,14 +1,15 @@
-import pytest
-import fakeredis
 from unittest.mock import MagicMock, patch
+
+import fakeredis
+import pytest
 
 from pottery.exceptions import QuorumNotAchieved, ReleaseUnlockedLock
 
 from configurable_redlock import ConfigurableREDLock, NoTimeoutCheck, ObjectLockTimeout
 from configurable_redlock.cache_counter import _RedisCounter
 
-
 # ── Fixtures ──────────────────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def redis():
@@ -30,6 +31,7 @@ def make_lock(redis, **kwargs):
 
 
 # ── __init__ ──────────────────────────────────────────────────────────────────
+
 
 class TestInit:
     def test_name_is_prefixed(self, redis):
@@ -67,6 +69,7 @@ class TestInit:
 
 # ── _get_masters ──────────────────────────────────────────────────────────────
 
+
 class TestGetMasters:
     def test_single_client_returns_set_of_one(self, redis):
         assert make_lock(redis)._get_masters() == {redis}
@@ -81,6 +84,7 @@ class TestGetMasters:
 
 
 # ── _make_redlock ─────────────────────────────────────────────────────────────
+
 
 class TestMakeRedlock:
     def test_passes_correct_params(self, redis, mock_redlock):
@@ -106,6 +110,7 @@ class TestMakeRedlock:
 
 # ── timeout=0 (wait forever) ──────────────────────────────────────────────────
 
+
 class TestTimeoutZero:
     def test_acquires_lock(self, redis, mock_redlock):
         with make_lock(redis, timeout=0) as cl:
@@ -130,6 +135,7 @@ class TestTimeoutZero:
 
 
 # ── timeout=-1 (skip if locked) ───────────────────────────────────────────────
+
 
 class TestTimeoutMinusOne:
     def test_acquires_when_free(self, redis, mock_redlock):
@@ -169,6 +175,7 @@ class TestTimeoutMinusOne:
 
 
 # ── timeout=N (wait up to N seconds) ─────────────────────────────────────────
+
 
 class TestTimeoutPositive:
     def test_acquires_immediately(self, redis, mock_redlock):
@@ -211,6 +218,7 @@ class TestTimeoutPositive:
 
 # ── silence_object_lock_timeout ───────────────────────────────────────────────
 
+
 class TestSilenceObjectLockTimeout:
     def test_swallows_object_lock_timeout(self, redis, mock_redlock):
         with make_lock(redis, timeout=0, silence_object_lock_timeout=True):
@@ -229,6 +237,7 @@ class TestSilenceObjectLockTimeout:
 
 # ── _release_lock ─────────────────────────────────────────────────────────────
 
+
 class TestReleaseLock:
     def test_swallows_release_unlocked_lock(self, redis, mock_redlock):
         _, inst = mock_redlock
@@ -244,6 +253,7 @@ class TestReleaseLock:
 
 
 # ── Statistics ────────────────────────────────────────────────────────────────
+
 
 class TestStatistics:
     def test_waiting_counter_decremented_after_acquire(self, redis, mock_redlock):
@@ -273,6 +283,7 @@ class TestStatistics:
 
 
 # ── _RedisCounter ─────────────────────────────────────────────────────────────
+
 
 class TestRedisCounter:
     def test_incr_increments(self, redis):

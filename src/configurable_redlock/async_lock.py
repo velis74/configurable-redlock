@@ -57,9 +57,7 @@ class ConfigurableAIOREDLock:
         :param auto_release_time: lock TTL in seconds (deadlock prevention). Default: 30s.
         """
         if not _POTTERY_AVAILABLE:
-            raise ImportError(
-                "pottery is required for ConfigurableAIOREDLock. Install it with: pip install pottery"
-            )
+            raise ImportError("pottery is required for ConfigurableAIOREDLock. Install it with: pip install pottery")
 
         if timeout is None or (timeout < 0 and timeout != -1):
             raise Exception("Invalid timeout value")

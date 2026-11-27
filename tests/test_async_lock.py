@@ -1,14 +1,15 @@
-import pytest
-import fakeredis.aioredis as aioredis
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import fakeredis.aioredis as aioredis
+import pytest
 
 from pottery.exceptions import QuorumNotAchieved, ReleaseUnlockedLock
 
 from configurable_redlock import ConfigurableAIOREDLock, NoTimeoutCheck, ObjectLockTimeout
 from configurable_redlock.async_lock import _AIORedisCounter
 
-
 # ── Fixtures ──────────────────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def redis():
@@ -31,6 +32,7 @@ def make_lock(redis, **kwargs):
 
 
 # ── __init__ ──────────────────────────────────────────────────────────────────
+
 
 class TestInit:
     def test_name_is_prefixed(self, redis):
@@ -68,6 +70,7 @@ class TestInit:
 
 # ── _get_masters ──────────────────────────────────────────────────────────────
 
+
 class TestGetMasters:
     def test_single_client_returns_set_of_one(self, redis):
         assert make_lock(redis)._get_masters() == {redis}
@@ -82,6 +85,7 @@ class TestGetMasters:
 
 
 # ── _make_redlock ─────────────────────────────────────────────────────────────
+
 
 class TestMakeRedlock:
     async def test_passes_correct_params(self, redis, mock_redlock):
@@ -107,6 +111,7 @@ class TestMakeRedlock:
 
 # ── timeout=0 (wait forever) ──────────────────────────────────────────────────
 
+
 class TestTimeoutZero:
     async def test_acquires_lock(self, redis, mock_redlock):
         async with make_lock(redis, timeout=0) as cl:
@@ -131,6 +136,7 @@ class TestTimeoutZero:
 
 
 # ── timeout=-1 (skip if locked) ───────────────────────────────────────────────
+
 
 class TestTimeoutMinusOne:
     async def test_acquires_when_free(self, redis, mock_redlock):
@@ -170,6 +176,7 @@ class TestTimeoutMinusOne:
 
 
 # ── timeout=N (wait up to N seconds) ─────────────────────────────────────────
+
 
 class TestTimeoutPositive:
     async def test_acquires_immediately(self, redis, mock_redlock):
@@ -212,6 +219,7 @@ class TestTimeoutPositive:
 
 # ── silence_object_lock_timeout ───────────────────────────────────────────────
 
+
 class TestSilenceObjectLockTimeout:
     async def test_swallows_object_lock_timeout(self, redis, mock_redlock):
         async with make_lock(redis, timeout=0, silence_object_lock_timeout=True):
@@ -230,6 +238,7 @@ class TestSilenceObjectLockTimeout:
 
 # ── _release_lock ─────────────────────────────────────────────────────────────
 
+
 class TestReleaseLock:
     async def test_swallows_release_unlocked_lock(self, redis, mock_redlock):
         _, inst = mock_redlock
@@ -245,6 +254,7 @@ class TestReleaseLock:
 
 
 # ── Statistics ────────────────────────────────────────────────────────────────
+
 
 class TestStatistics:
     async def test_waiting_counter_decremented_after_acquire(self, redis, mock_redlock):
@@ -274,6 +284,7 @@ class TestStatistics:
 
 
 # ── _AIORedisCounter ──────────────────────────────────────────────────────────
+
 
 class TestAIORedisCounter:
     async def test_incr_increments(self, redis):
