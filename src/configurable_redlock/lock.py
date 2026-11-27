@@ -40,7 +40,8 @@ class ConfigurableREDLock:
         :param name: lock name
         :param timeout: 0 = wait forever; -1 = skip if locked; N = wait up to N seconds
         :param silence_object_lock_timeout: suppress ObjectLockTimeout on exit
-        :param redis_client: single Redis client or iterable of clients for multi-master Redlock; defaults to redis.Redis()
+        :param redis_client: single Redis client or iterable of clients for multi-master Redlock;
+            defaults to redis.Redis()
         :param auto_release_time: lock TTL in seconds (deadlock prevention). Default: 30s.
         """
         if not _POTTERY_AVAILABLE:
@@ -149,7 +150,7 @@ class ConfigurableREDLock:
             self._release_lock()
         return None
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *_args, **_kwargs):
         self.timeout_checked = True
         if self.raise_timeout_exception:
             raise ObjectLockTimeout()

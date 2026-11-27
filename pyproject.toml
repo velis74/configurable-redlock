@@ -68,6 +68,8 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
+# N818 requires exception names to end in "Error"; these names are public API.
+"src/configurable_redlock/exceptions.py" = ["N818"]
 
 [tool.ruff.format]
 quote-style = "double"

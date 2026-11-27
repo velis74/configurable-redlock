@@ -50,11 +50,11 @@ class TestInit:
         assert make_lock(redis, auto_release_time=10.0)._auto_release_time == 10.0
 
     def test_timeout_none_raises(self, redis):
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match="Invalid timeout value"):
             make_lock(redis, timeout=None)
 
     def test_timeout_minus_two_raises(self, redis):
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match="Invalid timeout value"):
             make_lock(redis, timeout=-2)
 
     def test_timeout_zero_valid(self, redis):
@@ -112,11 +112,13 @@ class TestMakeRedlock:
 
 
 class TestTimeoutZero:
-    def test_acquires_lock(self, redis, mock_redlock):
+    @pytest.mark.usefixtures("mock_redlock")
+    def test_acquires_lock(self, redis):
         with make_lock(redis, timeout=0) as cl:
             assert cl._lock_acquired
 
-    def test_no_cl_call_needed(self, redis, mock_redlock):
+    @pytest.mark.usefixtures("mock_redlock")
+    def test_no_cl_call_needed(self, redis):
         with make_lock(redis, timeout=0):
             pass  # no NoTimeoutCheck raised
 
@@ -138,7 +140,8 @@ class TestTimeoutZero:
 
 
 class TestTimeoutMinusOne:
-    def test_acquires_when_free(self, redis, mock_redlock):
+    @pytest.mark.usefixtures("mock_redlock")
+    def test_acquires_when_free(self, redis):
         with make_lock(redis, timeout=-1) as cl:
             cl()
             assert cl._lock_acquired
@@ -146,7 +149,7 @@ class TestTimeoutMinusOne:
     def test_raises_object_lock_timeout_when_locked(self, redis, mock_redlock):
         _, inst = mock_redlock
         inst.acquire.return_value = False
-        with pytest.raises(ObjectLockTimeout):
+        with pytest.raises(ObjectLockTimeout):  # noqa: PT012
             with make_lock(redis, timeout=-1) as cl:
                 cl()
                 pytest.fail("should not reach here")
@@ -168,7 +171,8 @@ class TestTimeoutMinusOne:
                 cl()
         inst.release.assert_not_called()
 
-    def test_no_timeout_check_without_cl(self, redis, mock_redlock):
+    @pytest.mark.usefixtures("mock_redlock")
+    def test_no_timeout_check_without_cl(self, redis):
         with pytest.raises(NoTimeoutCheck):
             with make_lock(redis, timeout=-1):
                 pass
@@ -178,7 +182,8 @@ class TestTimeoutMinusOne:
 
 
 class TestTimeoutPositive:
-    def test_acquires_immediately(self, redis, mock_redlock):
+    @pytest.mark.usefixtures("mock_redlock")
+    def test_acquires_immediately(self, redis):
         with make_lock(redis, timeout=5) as cl:
             cl()
             assert cl._lock_acquired
@@ -203,7 +208,8 @@ class TestTimeoutPositive:
             cl()
         inst.release.assert_called_once()
 
-    def test_no_timeout_check_without_cl(self, redis, mock_redlock):
+    @pytest.mark.usefixtures("mock_redlock")
+    def test_no_timeout_check_without_cl(self, redis):
         with pytest.raises(NoTimeoutCheck):
             with make_lock(redis, timeout=5):
                 pass
@@ -220,16 +226,19 @@ class TestTimeoutPositive:
 
 
 class TestSilenceObjectLockTimeout:
-    def test_swallows_object_lock_timeout(self, redis, mock_redlock):
+    @pytest.mark.usefixtures("mock_redlock")
+    def test_swallows_object_lock_timeout(self, redis):
         with make_lock(redis, timeout=0, silence_object_lock_timeout=True):
             raise ObjectLockTimeout()
 
-    def test_does_not_swallow_other_exceptions(self, redis, mock_redlock):
-        with pytest.raises(ValueError):
+    @pytest.mark.usefixtures("mock_redlock")
+    def test_does_not_swallow_other_exceptions(self, redis):
+        with pytest.raises(ValueError, match="other"):
             with make_lock(redis, timeout=0, silence_object_lock_timeout=True):
                 raise ValueError("other")
 
-    def test_false_propagates_object_lock_timeout(self, redis, mock_redlock):
+    @pytest.mark.usefixtures("mock_redlock")
+    def test_false_propagates_object_lock_timeout(self, redis):
         with pytest.raises(ObjectLockTimeout):
             with make_lock(redis, timeout=0, silence_object_lock_timeout=False):
                 raise ObjectLockTimeout()
@@ -271,7 +280,8 @@ class TestStatistics:
         items = redis.lrange("ConfigurableLockKeys", 0, -1)
         assert b'"Waiting.ConfigurableLock.test"' in items
 
-    def test_waiting_key_not_duplicated(self, redis, mock_redlock):
+    @pytest.mark.usefixtures("mock_redlock")
+    def test_waiting_key_not_duplicated(self, redis):
         cl = make_lock(redis, timeout=0)
         cl.set_waiting(True)
         cl.set_waiting(True)
