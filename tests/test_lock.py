@@ -316,3 +316,8 @@ class TestRedisCounter:
         c = _RedisCounter("counter", redis)
         c.incr(step=0)
         assert redis.get("counter") is None
+
+
+def test_without_pottery_raises_import_error():
+    with patch("configurable_redlock.lock._POTTERY_AVAILABLE", False), pytest.raises(ImportError, match="pottery"):
+        ConfigurableREDLock(name="no-pottery")

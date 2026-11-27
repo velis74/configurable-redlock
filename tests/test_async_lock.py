@@ -317,3 +317,11 @@ class TestAIORedisCounter:
         c = _AIORedisCounter("counter", redis)
         await c.incr(step=0)
         assert await redis.get("counter") is None
+
+
+def test_without_pottery_raises_import_error():
+    with (
+        patch("configurable_redlock.async_lock._POTTERY_AVAILABLE", False),
+        pytest.raises(ImportError, match="pottery"),
+    ):
+        ConfigurableAIOREDLock(name="no-pottery")
